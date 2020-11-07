@@ -3,24 +3,32 @@ package ru.geekbrains.parser.avito;
 import lombok.extern.java.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.geekbrains.entity.system.Proxy;
+import ru.geekbrains.repository.ProxyRepository;
+import ru.geekbrains.service.system.ProxyService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Log
 @Service
@@ -29,7 +37,11 @@ public class AvitoClient {
 
     public static final Integer SORT_NEW_FIRST = 104;
 
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private CloseableHttpClient httpClient;
+
+    private ProxyService proxyService;
+
+    private Proxy proxy;
 
     @Value("${parsers.avito.baseUrl:https://www.avito.ru}")
     private String baseUrl;
@@ -42,6 +54,24 @@ public class AvitoClient {
 
     @Value("${parsers.avito.apartmentCategoryUrlPath:/kvartiry/prodam-ASgBAgICAUSSA8YQ}")
     private String apartmentCategoryUrlPath;
+
+    @Autowired
+    public AvitoClient(ProxyService proxyService) {
+        this.proxyService = proxyService;
+        Optional<Proxy> optionalProxy = proxyService.findByActive();
+        if(!optionalProxy.isPresent()){
+            throw new RuntimeException("No valid proxy");
+        }
+        this.proxy = optionalProxy.get();
+
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(this.proxy.getHost(), Integer.parseInt(this.proxy.getPort())),
+                new UsernamePasswordCredentials(this.proxy.getLogin(), this.proxy.getPassword()));
+        this.httpClient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider).build();
+    }
 
     public String findCity(String city) {
 
@@ -86,6 +116,7 @@ public class AvitoClient {
 
             HttpGet request = new HttpGet(builder.build());
             this.prepareHeaders(request);
+            this.setProxy(request);
 
             return this.request(request);
         } catch (Exception e) {
@@ -110,6 +141,17 @@ public class AvitoClient {
 
         //TODO сделать генерацию user agent
         request.addHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36");
+    }
+
+    private void setProxy(HttpRequestBase request) {
+
+
+        HttpHost proxy = new HttpHost(this.proxy.getHost(), Integer.parseInt(this.proxy.getPort()), "http");
+        RequestConfig config = RequestConfig.custom()
+                .setProxy(proxy)
+                .build();
+        request.setConfig(config);
+
     }
 
     private String request(HttpUriRequest request) {

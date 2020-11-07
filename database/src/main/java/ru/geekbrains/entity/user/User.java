@@ -34,15 +34,19 @@ public class User {
 
     @PrimaryKeyJoinColumn
     @OneToOne(cascade = CascadeType.ALL)
+    private PersonalData personalData;
+
+    @PrimaryKeyJoinColumn
+    @OneToOne(cascade = CascadeType.ALL)
     private Profile profile;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "status")
     private Status status;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
-    @JoinTable(name = "users_roles",
+    @JoinTable(name = "users_roles", schema = "client",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     List<Role> roles;

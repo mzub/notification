@@ -3,8 +3,6 @@ package ru.geekbrains.entity.user;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 
@@ -18,7 +16,16 @@ public class Profile {
     @Column(name = "id")
     Long id;
 
-    //@OneToMany(mappedBy = "profile")
-    //@Cascade(CascadeType.ALL)
-    //List<PersonalData> personalData;
+    @Column(name = "whats_app")
+    Boolean whatsApp;
+
+    @Column(name = "facebook")
+    Boolean facebook;
+
+    @Column(name = "telegram")
+    Boolean telegram;
+
+    @Column(name = "email")
+    Boolean email;
+
 }

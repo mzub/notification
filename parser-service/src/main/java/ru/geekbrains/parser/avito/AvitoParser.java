@@ -114,6 +114,7 @@ public class AvitoParser extends Parser implements Runnable {
                 AvitoApartment avitoApartment = this.parseApartment(apartmentUrl);
                 if (!avitoApartment.isEmpty()) {
                     avitoApartments.add(avitoApartment);
+                    break;
                 }
             }
 
@@ -131,6 +132,7 @@ public class AvitoParser extends Parser implements Runnable {
     private Integer findCityId(String city) throws CityNotFound {
 
         String response = client.findCity(city);
+        log.info(response);
 
         if (response == null) {
             throw new CityNotFound("Empty city list");

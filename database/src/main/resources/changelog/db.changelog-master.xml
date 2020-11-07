@@ -27,5 +27,9 @@
     <changeSet id="6" author="Artem Pugachev">
         <tagDatabase tag="ads_init"/>
     </changeSet>
+    <include file="v-1.1_proxy/db.changelog-v.1.0.xml" relativeToChangelogFile="true"/>
+    <changeSet id="8" author="alex">
+        <tagDatabase tag="ads_init"/>
+    </changeSet>
 
 </databaseChangeLog>

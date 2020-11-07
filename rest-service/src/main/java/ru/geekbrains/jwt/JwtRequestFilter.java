@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Component
 @AllArgsConstructor
@@ -29,14 +30,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        Enumeration<String> headerNames = request.getHeaderNames();
 
         log.info("Authorization token " + authHeader);
         String username = null;
-        String jwt = null;
+//        String jwt = null;
         if (authHeader != null) {
-            jwt = authHeader.substring(7);
+//            jwt = authHeader.substring(7);
             try {
-                username = jwtTokenProvider.getUsername(jwt);
+                username = jwtTokenProvider.getUsername(authHeader);
             } catch (ExpiredJwtException ex) {
                 log.info("Token is invalid: " + ex.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "{ msg: The token is expired }");
@@ -44,7 +46,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 try {
-                    Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
+                    Authentication authentication = jwtTokenProvider.getAuthentication(authHeader);
                     if (authentication != null) {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }

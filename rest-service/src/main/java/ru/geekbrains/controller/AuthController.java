@@ -11,12 +11,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.dto.JwtRequestToken;
 import ru.geekbrains.dto.JwtResponseToken;
+import ru.geekbrains.dto.ProfileUserDto;
 import ru.geekbrains.dto.RegisterUserDto;
+import ru.geekbrains.entity.user.PersonalData;
 import ru.geekbrains.jwt.JwtTokenProvider;
 import ru.geekbrains.service.UserDetailsServiceImplements;
 import ru.geekbrains.service.UserService;
 
-import javax.persistence.*;
+import java.security.Principal;
 
 @RequestMapping("/auth")
 @RestController
@@ -46,6 +48,18 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody RegisterUserDto registerUserDto) {
         userService.save(registerUserDto);
         return ResponseEntity.ok("зарегистрироан");
+    }
+
+    @PostMapping("/profile")
+    public ResponseEntity<?> profile(@RequestBody ProfileUserDto profileUserDto, Principal principal) {
+        userService.savePersonalData(principal.getName(), profileUserDto);
+        return ResponseEntity.ok("профиль обнавлен");
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(Principal principal) throws JsonProcessingException {
+        PersonalData personalData = userService.getPersonalData(principal.getName());
+        return ResponseEntity.ok(objectMapper.writeValueAsString(personalData));
     }
 
 }

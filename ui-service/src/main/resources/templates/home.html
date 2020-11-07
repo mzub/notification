@@ -22,10 +22,10 @@
     </style>
 </head>
 <body>
+<div th:replace="~{components/navigation :: navigation(home)}" />
 <div class="d-flex justify-content-center text-center">
     <div style="width: 100px; max-width: 100px">
         <p th:text="${info}"></p>
-        <p th:if="${token}" th:text="${token}"></p>
     </div>
 </div>
 

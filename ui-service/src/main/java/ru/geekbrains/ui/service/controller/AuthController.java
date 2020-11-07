@@ -20,7 +20,10 @@ import org.springframework.web.client.RestTemplate;
 import ru.geekbrains.ui.service.bean.Token;
 import ru.geekbrains.ui.service.dto.JwtResponseToken;
 import ru.geekbrains.ui.service.validation.AuthUser;
+import ru.geekbrains.ui.service.validation.ProfileUser;
 import ru.geekbrains.ui.service.validation.RegistrationUser;
+
+import java.util.Objects;
 
 
 @Controller
@@ -39,8 +42,8 @@ public class AuthController {
     private String urlDb;
 
     private final Token token;
-    private final RestTemplate restTemplate;
     private final AuthenticationManager authenticationManager;
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
 
@@ -94,8 +97,9 @@ public class AuthController {
         ResponseEntity<String> responseEntity = restTemplate
                 .exchange(urlDb + "/auth/login", HttpMethod.POST, request, String.class);
 
-        JwtResponseToken jwtResponseToken = objectMapper.readValue(responseEntity.getBody(), JwtResponseToken.class);
-        token.setToken(jwtResponseToken.getToken());
+        JwtResponseToken jwtResponseToken = objectMapper.readValue(Objects.requireNonNull(responseEntity.getBody()), JwtResponseToken.class);
+        token.setTokenValidateAndAuthentication(jwtResponseToken.getToken());
+
         log.info("set token");
         return "redirect:/home";
     }
@@ -105,6 +109,47 @@ public class AuthController {
         token.setToken(null);
         return "redirect:/auth";
     }
+
+    @GetMapping("/profile")
+    public String addProfile(Model model) throws JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        if (token.getToken() != null) {
+            headers.set("Authorization", token.getToken());
+        }
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(urlDb + "/auth/profile", HttpMethod.GET, request, String.class);
+
+        ProfileUser profileUser = objectMapper.readValue(Objects.requireNonNull(responseEntity.getBody()), ProfileUser.class);
+        if (profileUser == null){
+            profileUser = new ProfileUser();
+        }
+        model.addAttribute("profileUser", profileUser);
+        model.addAttribute("info", "set profile");
+        return "auth/profile";
+    }
+
+    @PostMapping("/profile/process")
+    public String processProfileForm(
+            @ModelAttribute("profileUser") @Validated ProfileUser profileUser,
+            BindingResult bindingResult,
+            Model model) throws JsonProcessingException {
+
+        if (bindingResult.hasErrors()) {
+            return "auth/profile";
+        }
+        HttpHeaders headers = new HttpHeaders();
+        if (token.getToken() != null) {
+            headers.set("Authorization", token.getToken());
+        }
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(profileUser), headers);
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(urlDb + "/auth/profile", HttpMethod.POST, request, String.class);
+        return "redirect:/home";
+    }
+
 
     @ExceptionHandler
     public String handleException(HttpClientErrorException exc, Model model) {

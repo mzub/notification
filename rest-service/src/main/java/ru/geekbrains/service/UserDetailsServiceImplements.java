@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.config.SecurityUserImplements;
 import ru.geekbrains.entity.user.User;
 import ru.geekbrains.repository.UserRepository;
@@ -18,8 +19,9 @@ public class UserDetailsServiceImplements implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
-        User user = userRepository.findByLogin(phone).orElseThrow(() ->
+    @Transactional
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        User user = userRepository.findByLogin(login).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));
         return SecurityUserImplements.createUser(user);
     }
