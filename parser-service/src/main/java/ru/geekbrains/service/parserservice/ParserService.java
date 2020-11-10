@@ -1,7 +1,8 @@
 package ru.geekbrains.service.parserservice;
 
 import lombok.Data;
-import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import ru.geekbrains.model.Parser;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.TaskService;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -45,7 +47,7 @@ public class ParserService {
         timer.schedule(timerTask, new Date(), delay);
     }
 
-    private void checkingTasks(){
+    private void checkingTasks() {
 
         log.info("checking tasks");
 
@@ -53,29 +55,31 @@ public class ParserService {
             log.info("start task!");
             parsers.forEach(p -> {
                 p.start(taskService.peek().getCountry(), taskService.peek().getCity());
-            });
-            processing = true;
-        }
-
-        if (!taskService.isEmpty() && processing){
-            if(parsers.stream().allMatch(Parser::getProcessingStatus)){
-                log.info("processing...");
-            } else {
-                checkResult();
-                if(parsers.stream().noneMatch(Parser::getProcessingStatus)){
-                    taskService.poll();
-                    processing = false;
-                }
-            }
-        }
-
-        if(taskService.isEmpty())
-        log.info("taskService.isEmpty()");
+        });
+        processing = true;
     }
 
-    private void checkResult(){
+        if(!taskService.isEmpty()&&processing)
+
+    {
+        if (parsers.stream().allMatch(Parser::getProcessingStatus)) {
+            log.info("processing...");
+        } else {
+            checkResult();
+            if (parsers.stream().noneMatch(Parser::getProcessingStatus)) {
+                taskService.poll();
+                processing = false;
+            }
+        }
+    }
+
+        if(taskService.isEmpty())
+                log.info("taskService.isEmpty()");
+}
+
+    private void checkResult() {
         parsers.forEach(p -> {
-            if(!p.getProcessingStatus()){
+            if (!p.getProcessingStatus()) {
                 log.info("getting results from " + p.getName());
                 //получаем список
                 adService.saveAds(p.getResult(), p.getName());
@@ -83,7 +87,7 @@ public class ParserService {
         });
     }
 
-    public void register(Parser parser){
+    public void register(Parser parser) {
         log.info(String.format("parser %s has been registered", parser.getName()));
         parsers.add(parser);
     }

@@ -24,16 +24,4 @@ public class Country {
     @OneToMany(mappedBy = "country")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     List<Region> regions;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
 }

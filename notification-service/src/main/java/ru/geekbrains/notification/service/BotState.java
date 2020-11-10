@@ -3,7 +3,10 @@ package ru.geekbrains.notification.service;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import ru.geekbrains.entity.user.User;
 import ru.geekbrains.notification.telegram.TelegramBotContext;
+
+import java.util.Optional;
 
 @Slf4j
 public enum  BotState {
@@ -30,10 +33,15 @@ public enum  BotState {
         public void handleInput(TelegramBotContext context) {
             //проверяем логин и связываем id c учетной записью
             log.info("### user input - " + context.getInput());
-            if(context.getInput().toUpperCase().contains("NEXT")){
+
+            Optional<User> user = context.findByLogin(context.getInput());
+            if(user.isPresent()){
+                context.getUser().setUser(user.get());
+                log.info(String.format("### Связываем телеграм с пользователем %s", user.get()));
                 next = QUESTION_1;
             } else {
                 next = CHECK_AUTH;
+                log.info(String.format("### Пользователь с логином %s не найден", context.getInput()));
             }
         }
 

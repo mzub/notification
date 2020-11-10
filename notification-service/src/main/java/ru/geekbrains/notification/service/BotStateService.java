@@ -28,9 +28,7 @@ public class BotStateService {
             botData.setUser(userRepository.findByLogin("test").get());
         }
         log.info(String.format("save bot state with chatID = {%s}", botData.getChatId()));
-//        if(!isConstrainsChatId(botStateData.getChatId())) {
-            botStateRepository.save(botData);
-//        }
+        botStateRepository.save(botData);
     }
 
     @Transactional(readOnly = true)

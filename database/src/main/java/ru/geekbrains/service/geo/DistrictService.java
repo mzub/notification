@@ -37,7 +37,7 @@ public class DistrictService{
     @Transactional
     public District findOrCreate(@NonNull String name, @NonNull City city) {
 
-        Optional<District> districtOptional = repository.findByNameContainingIgnoreCaseAndCity(name, city);
+        Optional<District> districtOptional = repository.findByNameIgnoreCaseAndCity(name, city);
 
         if (districtOptional.isPresent()) {
             return districtOptional.get();

@@ -13,6 +13,11 @@ The service will allow users to receive notifications about the appearance of ne
 
 <img src="https://github.com/3dartix/notification/blob/master/pic/scheme.jpg" alt="project schema"/>
 
+## Настройки для запуска
+Для запуска парсера cian.ru необходимо накатить 2 служебные таблицы с кодами городов
+`psql -U <Логин_в_постгрес> <имя_базы> < C:\Users\Atrem\Desktop\del\10\cian_service_tables\cian_service_tables.dump`
+[Ссылка на dump таблиц](https://drive.google.com/file/d/1P4nj3DT3R6SU4NosVGglkYrQngoxC_mx/view?usp=sharing)
+
 ## Project description:
 
 #### Как это работает. 

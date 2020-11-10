@@ -66,7 +66,7 @@ public class AvitoParser extends Parser implements Runnable {
         this.parserService = parserService;
         this.geoService = geoService;
 
-        this.parserService.register(this);
+//        this.parserService.register(this);
     }
 
     public void start(String country, String city) {
