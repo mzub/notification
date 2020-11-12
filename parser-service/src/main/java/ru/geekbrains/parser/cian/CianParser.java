@@ -1,9 +1,6 @@
 package ru.geekbrains.parser.cian;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
-import com.gargoylesoftware.htmlunit.ProxyConfig;
-import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -33,6 +30,7 @@ import ru.geekbrains.entity.Ad;
 import ru.geekbrains.entity.Address;
 import ru.geekbrains.entity.system.Proxy;
 import ru.geekbrains.model.Parser;
+import ru.geekbrains.model.Task;
 import ru.geekbrains.parser.ApartmentParserInterface;
 import ru.geekbrains.parser.cian.utils.AdsNotFoundException;
 import ru.geekbrains.parser.cian.utils.CaptchaException;
@@ -40,9 +38,13 @@ import ru.geekbrains.parser.cian.utils.CianRegionDefiner;
 import ru.geekbrains.parser.cian.utils.DataExtractor;
 import ru.geekbrains.service.parserservice.ParserService;
 import ru.geekbrains.service.system.ProxyService;
+import sun.management.VMOptionCompositeData;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -71,7 +73,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @Component
-public class CianParser extends Parser {
+public class CianParser extends Parser implements Runnable {
 
     private final DataExtractor dataExtractor;
     private final CianRegionDefiner cianRegionDefiner;
@@ -81,6 +83,7 @@ public class CianParser extends Parser {
     private ProxyService proxyService;
     private Proxy proxy;
     private ParserService parserService;
+    private Task task;
 
     @Autowired
     public CianParser(DataExtractor dataExtractor, CianRegionDefiner cianRegionDefiner, ProxyService proxyService, ParserService parserService) {
@@ -94,21 +97,30 @@ public class CianParser extends Parser {
         this.proxy = optionalProxy.get();
         this.parserService = parserService;
         this.parserService.register(this);
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
     }
-
     /**
-     * Fills Map interface implementor with <code>Address</code> as a key and List<code></><Ad></code> as a value
+     * Starts new Thread, initializes variable task
      *
      * @param country Name of a country where parser should find adTags
      * @param city    Name of a city in which parser should find adTags
      */
     public void start(String country, String city) {
+        task = new Task();
+        task.setCountry(country);
+        task.setCity(city);
+
+        new Thread(this).start();
+    }
+
+    @Override
+    public void run() {
         setProcessing(true);
-        if (!country.equals("Россия")) {
-            throw new RuntimeException("You are searching adTags in the country " + country + " but we can find ads only in 'Россия'");
+        if (!task.getCountry().equals("Россия")) {
+            throw new RuntimeException("You are searching adTags in the country " + task.getCountry() + " but we can find ads only in 'Россия'");
         }
 
-        List<String> regionCodes = cianRegionDefiner.getRegions(city);
+        List<String> regionCodes = cianRegionDefiner.getRegions(task.getCity());
         String pageValue = "1";
         boolean hasNextPage = true;
         for (String regionCode : regionCodes) {
@@ -126,7 +138,14 @@ public class CianParser extends Parser {
                         .addParameter("p", pageValue);
 
                 //*********** HtmlUnitDriver connection - 1st variant*****************
-                HtmlUnitDriver driver = new HtmlUnitDriver();
+                HtmlUnitDriver driver = new HtmlUnitDriver() {
+                    @Override
+                    protected WebClient modifyWebClient(WebClient client) {
+                        client.setCssErrorHandler(new SilentCssErrorHandler()); // shouting up wall of warnings in logs form htmlUnitDriver
+                        return client;
+                    }
+
+                };
 //               driver.get("https://ipinfo.io/ip");
                 driver.get(uri.toString());
                 Document document = Jsoup.parse(driver.getPageSource());
@@ -158,7 +177,7 @@ public class CianParser extends Parser {
 
                 for (Element adTag : adTags) {
                     CianApartment cianApartment = dataExtractor.buildApartment(adTag);
-                    if (cianApartment.getCity().equals(city)) cianApartments.add(cianApartment);
+                    if (cianApartment.getCity().equals(task.getCity())) cianApartments.add(cianApartment);
                 }
                 String pageValueMark = document.selectFirst("div[data-name~=^Pagination]").getElementsByTag("li").last().children().first().text();
                 if (!pageValueMark.equals("..")) {
