@@ -111,8 +111,7 @@ public enum  BotState {
         public void handleInput(TelegramBotContext context) {
             //проверка на валидность
             try {
-                int room = Integer.parseInt(context.getInput());
-                context.getUser().getAnswer().setRoom(room);
+                context.getUser().getAnswer().setRooms(context.getInput());
                 next = QUESTION_4;
             } catch (Exception e) {
                 next = QUESTION_3;
@@ -136,13 +135,63 @@ public enum  BotState {
         public void handleInput(TelegramBotContext context) {
             //проверка на валидность
             String[] prices = context.getInput().split("-");
+            int priceMin;
+            int priceMax;
+
             try {
-                //пока берем только 1 число
-                int priceMin = Integer.parseInt(context.getInput());
-                context.getUser().getAnswer().setPrice(priceMin);
-                next = END;
+                if(prices.length > 1) {
+                    priceMin = Integer.parseInt(prices[0]);
+                    priceMax = Integer.parseInt(prices[1]);
+
+                    context.getUser().getAnswer().setMinPrice(priceMin);
+                    context.getUser().getAnswer().setMaxPrice(priceMax);
+                } else {
+                    priceMin = Integer.parseInt(prices[0]);
+                    context.getUser().getAnswer().setMinPrice(priceMin);
+                }
+
+                next = QUESTION_5;
             } catch (Exception e) {
-                next = QUESTION_3;
+                next = QUESTION_4;
+            }
+        }
+
+        @Override
+        public BotState nextState() {
+            return next;
+        }
+    },
+
+    QUESTION_5(true) {
+        BotState next;
+        @Override
+        public void enter(TelegramBotContext context) {
+            sendMessage(context, "Какой нужен этаж? Например: 1,2,3,4, или поставьте прочерк (-), если это не нужно учитывать");
+        }
+
+        @Override
+        public void handleInput(TelegramBotContext context) {
+            //проверка на валидность
+            String[] floor = context.getInput().split(",");
+            if(floor.length > 1) {
+                try {
+                    for (int i = 0; i < floor.length; i++) {
+                        Integer.parseInt(floor[i]);
+                    }
+
+                    context.getUser().getAnswer().setFloor(context.getInput());
+
+                    next = END;
+                } catch (Exception e) {
+                    next = QUESTION_5;
+                }
+            } else {
+                if(context.getInput().equals("-")){
+                    context.getUser().getAnswer().setFloor(context.getInput());
+                    next = END;
+                } else {
+                    next = QUESTION_5;
+                }
             }
         }
 
