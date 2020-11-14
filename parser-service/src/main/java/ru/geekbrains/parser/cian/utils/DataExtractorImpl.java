@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.entity.*;
 import ru.geekbrains.parser.cian.CianApartment;
+import ru.geekbrains.parser.cian.utils.exception.FloorNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.PeriodNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.PriceNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.SquareInfoNotFoundException;
@@ -127,24 +127,15 @@ public class DataExtractorImpl implements DataExtractor {
 
     private Float getQuadrature(Element adTag) {
 
-        Element adTitle = adTag.select("span[data-mark$=OfferTitle]").first();
-        Element adSubtitle = adTag.select("span[data-mark$=OfferSubtitle]").first();
-
         Pattern squarePattern = Pattern.compile("\\d{1,4},?\\d{1,2}?\\sм²");
-        Matcher matcherSquareInTitle = squarePattern.matcher(adTitle.text());
-        Matcher matcherSquareInSubtitle = null;
-        if (adSubtitle != null) {
-            matcherSquareInSubtitle = squarePattern.matcher(adSubtitle.text());
-        }
+        Matcher matcherSquareInTitle = squarePattern.matcher(getTitle(adTag));
         String square;
         if (matcherSquareInTitle.find()) {
             square = matcherSquareInTitle.group();
-        } else if (matcherSquareInSubtitle != null && matcherSquareInSubtitle.find()) {
-            square = matcherSquareInSubtitle.group();
         } else {
             throw new SquareInfoNotFoundException("Apartment's square hasn't been found on the cian.ru page");
         }
-        String squareWithoutMetersAndRounded = String.valueOf(Math.round(Float.parseFloat(square.replaceAll("\\sм²", "").replaceAll(",", ""))));
+        String squareWithoutMetersAndRounded = String.valueOf(Float.parseFloat(square.replaceAll("\\sм²", "").replaceAll(",", ".")));
         return Float.parseFloat(squareWithoutMetersAndRounded);
 
     }
