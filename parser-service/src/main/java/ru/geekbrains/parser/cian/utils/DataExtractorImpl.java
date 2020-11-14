@@ -80,6 +80,7 @@ public class DataExtractorImpl implements DataExtractor {
         cianApartment.setDescription(this.getDescription(adTag));
         cianApartment.setInfoDescription(this.getTitle(adTag));
         cianApartment.setUrl(this.getLink(adTag));
+        cianApartment.setFloor(this.getFloor(adTag));
 
         return cianApartment;
     }
@@ -191,5 +192,17 @@ public class DataExtractorImpl implements DataExtractor {
     private String getLink(Element adTag) {
         Element adLinkTag = adTag.selectFirst("div[data-name$=LinkArea]");
         return adLinkTag.selectFirst("a").attr("href");
+    }
+
+    private int getFloor(Element adTag) {
+        Pattern floorPattern = Pattern.compile("\\d{1,2}/\\d{1,2}");
+        Matcher floorMatcher = floorPattern.matcher(getTitle(adTag));
+        int floor = 0;
+        if (floorMatcher.find()) {
+            floor = Integer.parseInt(floorMatcher.group().substring(0, floorMatcher.group().indexOf("/")));
+        } else {
+            throw new FloorNotFoundException("Floor hasn't been found on the page");
+        }
+        return floor;
     }
 }
