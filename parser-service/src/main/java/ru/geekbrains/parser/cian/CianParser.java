@@ -183,10 +183,9 @@ public class CianParser extends Parser implements Runnable {
                 if (!pageValueMark.equals("..")) {
                     hasNextPage = false;
                 }
-
                 pageValue = String.valueOf(Integer.parseInt(pageValue) + 1);
-
             }
+            pageValue = "1";
         }
         setProcessing(false);
     }
