@@ -81,6 +81,7 @@ public class DataExtractorImpl implements DataExtractor {
         cianApartment.setInfoDescription(this.getTitle(adTag));
         cianApartment.setUrl(this.getLink(adTag));
         cianApartment.setFloor(this.getFloor(adTag));
+        cianApartment.setIsDaily(this.getPeriod(adTag));
 
         return cianApartment;
     }
@@ -140,13 +141,13 @@ public class DataExtractorImpl implements DataExtractor {
 
     }
 
-    private String getPeriod(Element adTag) {
+    private Boolean getPeriod(Element adTag) {
         Element adPriceContent = adTag.select("span[data-mark$=MainPrice]").first();
         Pattern periodPattern = Pattern.compile("[ЁёА-я]{3,5}", Pattern.UNICODE_CHARACTER_CLASS);
         Matcher matcherPeriod = periodPattern.matcher(adPriceContent.text());
-        String period;
+        boolean period;
         if (matcherPeriod.find()) {
-            period = matcherPeriod.group().equals("мес") ? "месяц" : matcherPeriod.group();
+            period = matcherPeriod.group().equals("сутки");
         } else {
             throw new PeriodNotFoundException("Period hasn't been found on the cian.ru page");
         }
