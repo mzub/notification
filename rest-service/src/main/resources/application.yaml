@@ -4,7 +4,7 @@ server:
     context-path:
 spring:
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:changelog/db.changelog-master.xml
 
   datasource:
