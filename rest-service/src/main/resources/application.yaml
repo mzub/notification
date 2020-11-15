@@ -11,11 +11,11 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/notification}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:0}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
 
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
 #        format_sql:true
