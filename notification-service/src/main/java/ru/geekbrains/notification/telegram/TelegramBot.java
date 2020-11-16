@@ -40,17 +40,22 @@ public class TelegramBot extends TelegramLongPollingBot implements Notification 
     @Override
     public void sendMessage(String chatId, String response) {
         new Thread(() -> {
-            String[] ads = response.split("---");
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < ads.length; i++) {
-                if((i % 5) == 0){
-                    send(chatId, builder.toString());
-                    builder.setLength(0);
-                } else {
-                    builder.append(ads[i]);
+            //признак существования объявлений "---"
+            if(response.contains("---")) {
+                String[] ads = response.split("---");
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < ads.length; i++) {
+                    if((i % 5) == 0){
+                        send(chatId, builder.toString());
+                        builder.setLength(0);
+                    } else {
+                        builder.append(ads[i]);
+                    }
                 }
+                send(chatId, builder.toString());
+            } else {
+                send(chatId, "Объявлений по вашему запросов не найдено");
             }
-            send(chatId, builder.toString());
         }).start();
     }
 
@@ -60,7 +65,8 @@ public class TelegramBot extends TelegramLongPollingBot implements Notification 
         }
         SendMessage message = new SendMessage()
                 .setChatId(chatId)
-                .setText(response);
+                .setText(response)
+                .setParseMode("Markdown");
         try {
             this.execute(message);
         } catch (TelegramApiException e){
