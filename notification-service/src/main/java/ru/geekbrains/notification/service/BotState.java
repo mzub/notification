@@ -60,6 +60,11 @@ public enum  BotState {
 
         @Override
         public void handleInput(TelegramBotContext context) {
+            if(context.getInput().equalsIgnoreCase("назад")){
+                next = QUESTION_1;
+                return;
+            }
+
             //проверка на валидность
             if(!context.getInput().equals("")){
                 context.getUser().getAnswer().setCountry(context.getInput());
@@ -109,6 +114,11 @@ public enum  BotState {
 
         @Override
         public void handleInput(TelegramBotContext context) {
+            if(context.getInput().equalsIgnoreCase("назад")){
+                next = QUESTION_2;
+                return;
+            }
+
             //проверка на валидность
             try {
                 context.getUser().getAnswer().setRooms(context.getInput());
@@ -133,6 +143,11 @@ public enum  BotState {
 
         @Override
         public void handleInput(TelegramBotContext context) {
+            if(context.getInput().equalsIgnoreCase("назад")){
+                next = QUESTION_3;
+                return;
+            }
+
             //проверка на валидность
             String[] prices = context.getInput().split("-");
             int priceMin;
@@ -171,6 +186,11 @@ public enum  BotState {
 
         @Override
         public void handleInput(TelegramBotContext context) {
+            if(context.getInput().equalsIgnoreCase("назад")){
+                next = QUESTION_4;
+                return;
+            }
+
             //проверка на валидность
             String[] floor = context.getInput().split(",");
             if(floor.length > 1) {
@@ -205,14 +225,14 @@ public enum  BotState {
         @Override
         public void enter(TelegramBotContext context) {
             //формируем таску и отправляем в rest service
-            context.sendAnswer();
             sendMessage(context, "Ищем вариенты ... \n" +
                     context.getUser().getAnswer().toString());
+            context.sendAnswer();
         }
 
         @Override
         public BotState nextState() {
-            return CHECK_AUTH;
+            return QUESTION_1;
         }
     };
 

@@ -25,6 +25,6 @@ public class RequestController {
     @GetMapping(path = "/completed/{taskId}")
     public ResponseEntity<ResponseMessage> sendNotificationUser(@PathVariable @NonNull String taskId){
         log.info("get callback with id = " + taskId);
-        return requestService.sendResponseToNotificationService(taskId);
+        return requestService.findTaskAndSendResponseToNotificationService(taskId);
     }
 }

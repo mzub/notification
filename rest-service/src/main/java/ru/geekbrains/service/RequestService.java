@@ -44,15 +44,15 @@ public class RequestService {
         // добавляем taskID к запросу пользователя
         newRequest.setTaskID(task.getTaskId());
         
-        log.error("task: " + task.toString());
+        log.info("task: " + task.toString());
 
         //ищем по ключу запрос, если нашли, проверяем его актуальность
         RequestParam oldRequest = userRequestList.get(keyRequestParam);
         if(oldRequest != null){
             if(isRequestActual(oldRequest)){
                 // если данные актуальны, берем данные из базы без создания таски
-                //todo добавить поиск объявлений в БД и отправку пользователю
-                log.error("ничего не происходит, потому что запрос все еще актуален");
+                log.info("запрос все еще актуален, берем данные из базы");
+                sendResponseStart(newRequest);
                 return new ResponseEntity<>(new ResponseMessage("Создание задачи", "Парсинг по данному запросу актуален"), HttpStatus.OK);
             }
         } else {
@@ -70,7 +70,6 @@ public class RequestService {
         } else {
             log.error("ошибка создания задачи");
         }
-
         return response;
     }
 
@@ -104,18 +103,15 @@ public class RequestService {
         return new RestTemplate().postForEntity(url, task, ResponseMessage.class);
     }
 
-    public ResponseEntity<ResponseMessage> sendResponseToNotificationService(String taskId) {
+    public ResponseEntity<ResponseMessage> findTaskAndSendResponseToNotificationService(String taskId){
         log.info(String.format("Ищем задачу с id = %s", taskId));
         RequestParam requestParam = null;
-
         for(Map.Entry<String, RequestParam> entry : userRequestList.entrySet()) {
             if(entry.getValue().getTaskID().equals(taskId)){
                 requestParam = entry.getValue();
             }
         }
-
-
-//        // заглуша для тестов
+        //        // заглуша для тестов
 //        RequestParam requestParam = new RequestParam();
 //        requestParam.setChatId(630322017);
 //        Answer answer = new Answer();
@@ -127,10 +123,12 @@ public class RequestService {
 //        answer.setMaxPrice(19000);
 //        answer.setFloor("1,2,3,4,5,6,7");
 //        requestParam.setAnswer(answer);
+        return sendResponseStart(requestParam);
+    }
 
-
+    private ResponseEntity<ResponseMessage> sendResponseStart(RequestParam requestParam) {
         if(requestParam != null){
-            log.info(String.format("задача с id = %s найдена", taskId));
+            log.info(String.format("отправляем уведомление пользователю по запросу %s", requestParam));
             Map<String, List<Ad>> ads = searchService.findAdByFilter(requestParam);
             String response = Formatter.adsToString(ads);
 
@@ -141,11 +139,10 @@ public class RequestService {
             ResponseToNotifier responseToNotifier = new ResponseToNotifier("" + requestParam.getChatId(), response);
 
             log.info(String.format("task = %s", responseToNotifier));
-            //todo убрать заглушки с ответами
             return new RestTemplate().postForEntity(url, responseToNotifier, ResponseMessage.class);
         } else {
-            log.info(String.format("задача с id = %s не найдена", taskId));
-            ResponseMessage message = new ResponseMessage("Уведомление пользователю", String.format("задача с id = %s не найдена", taskId));
+            log.error("запрос пользователя не найден");
+            ResponseMessage message = new ResponseMessage("Уведомление пользователю", String.format("запрос пользователя не найден"));
             return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         }
     }

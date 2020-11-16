@@ -10,7 +10,7 @@ public class Formatter {
         StringBuilder stringBuilder = new StringBuilder();
         maps.forEach((key, adsList) -> {
             stringBuilder.append(" --- " + "\n");
-            stringBuilder.append(adsList.get(0).getTitle() + "\n");
+            stringBuilder.append("*" + adsList.get(0).getTitle() + "*\n");
 //            stringBuilder.append(a.getDescription() + "\n");
             stringBuilder.append("Цена: " + adsList.get(0).getPrice() + "\n");
             stringBuilder.append("Комнат: " + adsList.get(0).getRooms() + "\n");
