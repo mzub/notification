@@ -1,30 +1,22 @@
 package ru.geekbrains.parser.cian;
 
-import com.gargoylesoftware.htmlunit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.entity.system.Proxy;
 import ru.geekbrains.model.Parser;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.parser.ApartmentParserInterface;
-import ru.geekbrains.parser.cian.utils.ProxyGate;
-import ru.geekbrains.parser.cian.utils.ProxyGateImpl;
+import ru.geekbrains.parser.cian.utils.*;
 import ru.geekbrains.parser.cian.utils.exception.AdsNotFoundException;
-import ru.geekbrains.parser.cian.utils.exception.CaptchaException;
-import ru.geekbrains.parser.cian.utils.CianRegionDefiner;
-import ru.geekbrains.parser.cian.utils.DataExtractor;
 import ru.geekbrains.service.parserservice.ParserService;
-import ru.geekbrains.service.system.ProxyService;
 
 import java.util.*;
-import java.util.logging.Level;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -58,20 +50,22 @@ public class CianParser extends Parser implements Runnable {
     private final DataExtractor dataExtractor;
     private final ProxyGate proxyGate;
     private final CianRegionDefiner cianRegionDefiner;
+    private final CianConnector connector;
     private final List<ApartmentParserInterface> cianApartments = new ArrayList<>();
     private boolean isProcessing = false;
-    private final String name = "Циан";
+    @Value("${cian-parser.name}")
+    private String name;
     private ParserService parserService;
     private Task task;
 
     @Autowired
-    public CianParser(DataExtractor dataExtractor, CianRegionDefiner cianRegionDefiner, ParserService parserService, ProxyGate proxyGate) {
+    public CianParser(DataExtractor dataExtractor, CianRegionDefiner cianRegionDefiner, ParserService parserService, ProxyGate proxyGate, CianConnector connector) {
         this.dataExtractor = dataExtractor;
         this.proxyGate = proxyGate;
         this.cianRegionDefiner = cianRegionDefiner;
         this.parserService = parserService;
+        this.connector = connector;
         this.parserService.register(this);
-        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
     }
 
     /**
@@ -101,9 +95,8 @@ public class CianParser extends Parser implements Runnable {
         }
 
         List<String> regionCodes = cianRegionDefiner.getRegions(task.getCity());
-
         String pageValue = "1";
-        final String SEARCH_DEEP = "5";
+        final String SEARCH_DEEP = "2";
         final String DEAL_TYPE = "rent";
         final String OFFER_TYPE = "flat";
         boolean hasNextPage = true;
@@ -121,29 +114,7 @@ public class CianParser extends Parser implements Runnable {
                         .addParameter("region", regionCode)
                         .addParameter("p", pageValue);
 
-                //*********** HtmlUnitDriver connection - 1st variant*****************
-                HtmlUnitDriver driver = new HtmlUnitDriver() {
-                    @Override
-                    protected WebClient modifyWebClient(WebClient client) {
-                        client.setCssErrorHandler(new SilentCssErrorHandler()); // shouting up wall of warnings in logs form htmlUnitDriver
-                        return client;
-                    }
-
-                };
-
-                Proxy proxy = proxyGate.getProxy();
-                log.info("proxyGate has returned proxy with host:port - " + proxy.getAddress());
-                driver.setProxy(proxy.getHost(), Integer.parseInt(proxy.getPort()));
-                driver.get("https://ipinfo.io/ip");
-                log.info("Site https://ipinfo.io/ip is reporting that your IP is: " + Jsoup.parse(driver.getPageSource()).getElementsByTag("body").text());
-                driver.get(uri.toString());
-
-                Document document = Jsoup.parse(driver.getPageSource());
-
-                if (document.title().contains("Captcha")) {
-                   log.warn("Proxy " + proxy.getAddress() + " has been banned from " + this.getName());
-                   proxyGate.setProxyBlockedBy(this.getName(), proxy);
-                }
+                Document document = Jsoup.parse(connector.getHtmlPage(uri).orElseThrow(() -> new NoHtmlFromConnectorReturnedException("Connector has returned nothing from requested page")));
 
                 Elements adTags = document.getElementsByTag("article");
 
@@ -165,6 +136,7 @@ public class CianParser extends Parser implements Runnable {
                 pageValue = String.valueOf(Integer.parseInt(pageValue) + 1);
             }
             pageValue = "1";
+            hasNextPage = true;
         }
         setProcessing(false);
     }
