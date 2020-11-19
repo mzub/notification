@@ -96,7 +96,7 @@ public class CianParser extends Parser implements Runnable {
 
         List<String> regionCodes = cianRegionDefiner.getRegions(task.getCity());
         String pageValue = "1";
-        final String SEARCH_DEEP = "2";
+        final String SEARCH_DEEP = "5";
         final String DEAL_TYPE = "rent";
         final String OFFER_TYPE = "flat";
         boolean hasNextPage = true;
