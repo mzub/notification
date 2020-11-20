@@ -14,6 +14,7 @@ import ru.geekbrains.model.Task;
 import ru.geekbrains.parser.ApartmentParserInterface;
 import ru.geekbrains.parser.cian.utils.*;
 import ru.geekbrains.parser.cian.utils.exception.AdsNotFoundException;
+import ru.geekbrains.parser.cian.utils.exception.NoHtmlFromConnectorReturnedException;
 import ru.geekbrains.service.parserservice.ParserService;
 
 import java.util.*;
@@ -96,7 +97,7 @@ public class CianParser extends Parser implements Runnable {
 
         List<String> regionCodes = cianRegionDefiner.getRegions(task.getCity());
         String pageValue = "1";
-        final String SEARCH_DEEP = "2";
+        final String SEARCH_DEEP = "5";
         final String DEAL_TYPE = "rent";
         final String OFFER_TYPE = "flat";
         boolean hasNextPage = true;

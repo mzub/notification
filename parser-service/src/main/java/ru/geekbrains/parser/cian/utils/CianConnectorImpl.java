@@ -1,8 +1,5 @@
 package ru.geekbrains.parser.cian.utils;
 
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.Html;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -18,9 +15,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -57,7 +51,9 @@ public class CianConnectorImpl implements CianConnector {
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
 
         HttpGet request;
-        String htmlString;
+        String htmlString = null;
+        CloseableHttpResponse response = null;
+        HttpEntity entity = null;
 
         try {
             request = new HttpGet(uri.build());
@@ -67,20 +63,30 @@ public class CianConnectorImpl implements CianConnector {
                     .setProxy(httpProxy)
                     .build();
             request.setConfig(config);
-            CloseableHttpResponse response = httpClient.execute(request);
-
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                htmlString = EntityUtils.toString(entity);
-                if (htmlString.contains("Captcha")) {
-                    log.warn("Proxy " + proxy.getAddress() + " has been banned from " + this.getName());
-                    proxyGate.setProxyBlockedBy(this.getName(), proxy);
-                }
-                return Optional.of(htmlString);
-            }
-        } catch (IOException | URISyntaxException e) {
+            response = httpClient.execute(request);
+            entity = response.getEntity();
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (entity != null) {
+            try {
+                htmlString = EntityUtils.toString(entity);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (htmlString != null && htmlString.contains("Captcha")) {
+                log.warn("Proxy " + proxy.getAddress() + " has been banned from " + this.getName());
+                proxyGate.setProxyBlockedBy(this.getName(), proxy);
+            }
+            return Optional.ofNullable(htmlString);
         }
         return Optional.empty();
     }
