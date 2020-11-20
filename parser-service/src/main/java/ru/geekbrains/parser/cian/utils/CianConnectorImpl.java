@@ -67,20 +67,18 @@ public class CianConnectorImpl implements CianConnector {
             entity = response.getEntity();
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
-        } finally {
-            if (response != null) {
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         if (entity != null) {
             try {
                 htmlString = EntityUtils.toString(entity);
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             if (htmlString != null && htmlString.contains("Captcha")) {
                 log.warn("Proxy " + proxy.getAddress() + " has been banned from " + this.getName());
