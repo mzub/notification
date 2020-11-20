@@ -30,3 +30,5 @@ spring:
     serialization:
       indent_output: true
 
+cian-parser:
+  name: Циан
