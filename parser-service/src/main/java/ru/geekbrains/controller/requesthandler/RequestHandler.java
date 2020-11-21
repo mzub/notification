@@ -18,7 +18,7 @@ public class RequestHandler {
 
     private final RequestHandlerService requestHandlerService;
 
-    @PostMapping("task/create")
+    @PostMapping("parserTask/create")
     public ResponseEntity<ResponseMessage> addTask(@RequestBody @NonNull Task task) throws Exception {
         return requestHandlerService.addTask(task);
     }
