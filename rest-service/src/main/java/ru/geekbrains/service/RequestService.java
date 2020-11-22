@@ -96,7 +96,7 @@ public class RequestService {
     }
 
     private ResponseEntity<ResponseMessage> sendTaskToParsService(Task task) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8060").path("/task/create");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("").path("https://ren-parser-service.herokuapp.com/parserTask/create");
         String url = builder.build().encode().toUriString();
         log.info(String.format("url = %s", url));
         log.info(String.format("task = %s", task));
@@ -132,7 +132,7 @@ public class RequestService {
             Map<String, List<Ad>> ads = searchService.findAdByFilter(requestParam);
             String response = Formatter.adsToString(ads);
 
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8081").path("/callback");
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://ren-notification-service.herokuapp.com").path("/callback");
             String url = builder.build().encode().toUriString();
             log.info(String.format("url = %s", url));
 
