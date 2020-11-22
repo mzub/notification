@@ -1,1 +1,1 @@
-web: java -jar ui-service/target/ui-service-1.0-SNAPSHOT.jar
+web: java -jar $PATH_TO_JAR
