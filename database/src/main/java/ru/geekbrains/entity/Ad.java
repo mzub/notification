@@ -26,7 +26,7 @@ public class Ad {
     @Column(name = "title")
     String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
     @Column(name = "price")
