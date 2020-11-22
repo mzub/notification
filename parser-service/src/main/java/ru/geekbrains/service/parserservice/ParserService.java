@@ -98,7 +98,7 @@ public class ParserService {
     }
 
     private void sendCallBack(String taskId) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8079")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://ren-rest-service.herokuapp.com")
                 .path("/task/completed/" + taskId);
         //@GetMapping(path = "/completed/{taskId}")
         String url = builder.build().encode().toUriString();
