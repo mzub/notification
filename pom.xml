@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <modules>
+        <module>database</module>
         <module>cleaner-service</module>
         <module>ui-service</module>
         <module>parser-service</module>
         <module>notification-service</module>
         <module>rest-service</module>
-        <module>database</module>
     </modules>
-
+   
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -48,6 +48,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

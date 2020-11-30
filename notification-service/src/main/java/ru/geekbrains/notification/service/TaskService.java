@@ -9,9 +9,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.geekbrains.entity.bot.BotData;
 import ru.geekbrains.common.rest.ResponseMessage;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TaskService {
 
     private final RestTemplate restTemplate;

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.geekbrains.entity.system.Proxy;
 import ru.geekbrains.parser.cian.utils.exception.ParserNameNotDefinedException;
-import ru.geekbrains.service.system.ProxyService;
 
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.Date;
+import ru.geekbrains.service.system.ProxyService;
 
 @Slf4j
 @Data

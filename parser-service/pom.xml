@@ -19,6 +19,7 @@
             <groupId>ru.geekbrains</groupId>
             <artifactId>database</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -77,6 +78,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
     </dependencies>
 
     <build>

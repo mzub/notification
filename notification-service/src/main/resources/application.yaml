@@ -24,11 +24,11 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: update 
 
   jackson:
     serialization:
-      indent_output: true
+      INDENT_OUTPUT: true
 
 telegram:
   username: real_estate_notifier_bot
