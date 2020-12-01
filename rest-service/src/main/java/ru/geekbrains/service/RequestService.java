@@ -96,7 +96,7 @@ public class RequestService {
     }
 
     private ResponseEntity<ResponseMessage> sendTaskToParsService(Task task) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("").path("https://ren-parser-service.herokuapp.com/parserTask/create");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("").path("https://ren-parser-service.herokuapp.com/task/create");
         String url = builder.build().encode().toUriString();
         log.info(String.format("url = %s", url));
         log.info(String.format("task = %s", task));

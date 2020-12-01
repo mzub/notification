@@ -17,7 +17,7 @@ public class TaskService {
     private final RestTemplate restTemplate;
 
     public void send(BotData botData){
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://ren-rest-service.herokuapp.com").path("/parserTask/create");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://ren-rest-service.herokuapp.com").path("/task/create");
         String url = builder.build().encode().toUriString();
         log.info(String.format("url = %s", url));
         log.info(String.format("Создаем задачу для парсеров по запросу пользователя = %s, фильтры = %s",
