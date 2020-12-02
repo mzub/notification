@@ -18,6 +18,7 @@ import ru.geekbrains.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class UserService {
         userRepository.save(userNew);
     }
 
+    @Transactional
     public void savePersonalData(String login, ProfileUserDto profileUserDto) {
         User user = userRepository.findByLogin(login).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));

@@ -12,7 +12,7 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-    max-active: 2;
+    max-active: 2
 
   jpa:
     generate-ddl: false
