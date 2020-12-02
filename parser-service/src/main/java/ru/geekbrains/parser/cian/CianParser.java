@@ -103,7 +103,7 @@ public class CianParser extends Parser implements Runnable {
         boolean hasNextPage = true;
 
         for (String regionCode : regionCodes) {
-            while (hasNextPage) {  // uncomment to search throughout all the target pages
+            while (hasNextPage) {  
 
                 URIBuilder uri = new URIBuilder();
                 uri.setScheme("https")
@@ -119,16 +119,15 @@ public class CianParser extends Parser implements Runnable {
 
                 Elements adTags = document.getElementsByTag("article");
 
-                if (adTags.size() == 0)
+                if (adTags.isEmpty())
                     throw new AdsNotFoundException("There are no ads can be parsed from the page");
 
                 log.info("Page #" + pageValue + " is scanned");
                 log.info("Amount of ad tags on the page: " + adTags.size());
 
-                for (Element adTag : adTags) {
-                    CianApartment cianApartment = dataExtractor.buildApartment(adTag);
-                    if (cianApartment.getCity().equals(task.getCity())) cianApartments.add(cianApartment);
-                }
+		adTags.stream().map(adTag -> dataExtractor.buildApartment(adTag)).filter(cianApartment -> (cianApartment.getCity().equals(task.getCity()))).forEachOrdered(cianApartment -> {
+			cianApartments.add(cianApartment);
+		    });
 
                 String lastPageValueMark = document.selectFirst("div[data-name~=^Pagination]").getElementsByTag("li").last().children().first().text();
                 if (lastPageValueMark.equals(pageValue) || pageValue.equals(SEARCH_DEEP)) {
@@ -143,11 +142,13 @@ public class CianParser extends Parser implements Runnable {
     }
 
 
+    @Override
     public List<ApartmentParserInterface> getResult() {
 
         return cianApartments;
     }
 
+    @Override
     public boolean getProcessingStatus() {
         return isProcessing;
     }
