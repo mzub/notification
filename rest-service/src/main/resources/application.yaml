@@ -13,9 +13,9 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     tomcat:
-    	max-active: 3
+      max-active: 3
     hikari:
-        maximum-pool-size: 3
+      max-pool-size: 3
 
   jpa:
     generate-ddl: false
