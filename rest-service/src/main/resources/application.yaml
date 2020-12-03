@@ -12,7 +12,10 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-    max-active: 2
+    tomcat:
+    	max-active: 3
+    hikari:
+        maximum-pool-size: 3
 
   jpa:
     generate-ddl: false
