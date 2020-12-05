@@ -4,7 +4,7 @@ server:
     context-path: /
 spring:
   liquibase:
-    enabled: false
+    enabled: false 
     change-log: classpath:changelog/db.changelog-master.xml
 
   datasource:
@@ -19,7 +19,7 @@ spring:
     properties:
       hibernate:
 #        format_sql:true
-        ddl-auto: none
+        ddl-auto: update 
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
         temp:
           use_jdbc_metadata_defaults: false
