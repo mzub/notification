@@ -84,7 +84,7 @@ public class CianParser extends Parser implements Runnable {
     }
 
     /**
-     * Fills List<CinaApartements> with ads from cain.ru
+     * Fills List (CinaApartements) with ads from cain.ru
      * Search page deep is limited to SEARCH_DEEP value
      */
 
@@ -119,7 +119,7 @@ public class CianParser extends Parser implements Runnable {
 
                 Elements adTags = document.getElementsByTag("article");
 
-                if (adTags.size() == 0)
+                if (adTags.isEmpty())
                     throw new AdsNotFoundException("There are no ads can be parsed from the page");
 
                 log.info("Page #" + pageValue + " is scanned");
@@ -143,11 +143,13 @@ public class CianParser extends Parser implements Runnable {
     }
 
 
+    @Override
     public List<ApartmentParserInterface> getResult() {
 
         return cianApartments;
     }
 
+    @Override
     public boolean getProcessingStatus() {
         return isProcessing;
     }
