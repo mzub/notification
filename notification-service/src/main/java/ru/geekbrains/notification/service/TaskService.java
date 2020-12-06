@@ -17,7 +17,7 @@ public class TaskService {
 
     private final RestTemplate restTemplate;
     @Value("${REST_SERVICE_URL:http://localhost:8079}")
-    private final String REST_SERVICE_URL = "";
+    private final String REST_SERVICE_URL;
 
     public void send(BotData botData){
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(REST_SERVICE_URL).path("/task/create");
