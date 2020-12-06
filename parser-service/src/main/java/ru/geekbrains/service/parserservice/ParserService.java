@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class ParserService {
 
     @Value("${REST_SERVICE_URL:http://localhost:8079}")
-    private final String REST_SERVICE_URL;
+    private String REST_SERVICE_URL;
     private TaskService taskService;
     private AdService adService;
     private List<Parser> parsers = new LinkedList<>();
