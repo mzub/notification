@@ -16,7 +16,7 @@ import ru.geekbrains.common.rest.ResponseMessage;
 public class TaskService {
 
     private final RestTemplate restTemplate;
-    @Value("${RESET_SERVICE_URL:http://localhost:8079}")
+    @Value("${REST_SERVICE_URL:http://localhost:8079}")
     private final String REST_SERVICE_URL = "";
 
     public void send(BotData botData){
