@@ -2,6 +2,7 @@ package ru.geekbrains.notification.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,9 +16,11 @@ import ru.geekbrains.common.rest.ResponseMessage;
 public class TaskService {
 
     private final RestTemplate restTemplate;
+    @Value("${RESET_SERVICE_URL:http://localhost:8079}")
+    private final String REST_SERVICE_URL = "";
 
     public void send(BotData botData){
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8079").path("/task/create");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(REST_SERVICE_URL).path("/task/create");
         String url = builder.build().encode().toUriString();
         log.info(String.format("url = %s", url));
         log.info(String.format("Создаем задачу для парсеров по запросу пользователя = %s, фильтры = %s",

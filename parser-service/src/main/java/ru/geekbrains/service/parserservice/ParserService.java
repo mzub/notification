@@ -12,6 +12,7 @@ import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.TaskService;
 
 import java.util.*;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * 1. Парсеры регистрируются через метод register().
@@ -31,6 +32,8 @@ public class ParserService {
     private Map<String, Object> ads = new HashMap<>();
     private boolean processing = false;
     private long delay = 2000;
+    @Value("${REST_SERVICE_URL:http://localhost:8079}")
+    private final String REST_SERVICE_URL = "";
 
     @Autowired
     public ParserService(TaskService taskService, AdService adService) {
@@ -98,7 +101,7 @@ public class ParserService {
     }
 
     private void sendCallBack(String taskId) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8079")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(REST_SERVICE_URL)
                 .path("/task/completed/" + taskId);
         //@GetMapping(path = "/completed/{taskId}")
         String url = builder.build().encode().toUriString();
