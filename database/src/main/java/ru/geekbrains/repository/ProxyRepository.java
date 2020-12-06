@@ -10,11 +10,10 @@ import java.util.Optional;
 @Repository
 public interface ProxyRepository extends JpaRepository<Proxy, Long> {
 
-    Optional<Proxy> findByActive(Boolean active);
+    List<Proxy> findAllByActive(Boolean active);
 
     List<Proxy> findAllByBannedByCian(Boolean isBanned);
 
     List<Proxy> findAllByBannedByAvito(Boolean isBanned);
-
 
 }

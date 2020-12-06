@@ -4,7 +4,7 @@ server:
     context-path: /
 spring:
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:changelog/db.changelog-master.xml
 
   datasource:
@@ -12,6 +12,8 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/notification}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
+    hikari:
+      maximum-pool-size: 3
 
   jpa:
     generate-ddl: false
@@ -24,14 +26,14 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none 
 
   jackson:
     serialization:
       indent_output: true
 
 cleaner:
-  # в формате cron
+  # пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ cron
   start: "0 0 23 * * ?"
   delete:
     older-than: 100

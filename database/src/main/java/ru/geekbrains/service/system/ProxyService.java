@@ -5,10 +5,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.entity.system.Proxy;
-import ru.geekbrains.repository.ProxyRepository;
 
 import java.util.List;
 import java.util.Optional;
+import ru.geekbrains.repository.ProxyRepository;
 
 @Service
 public class ProxyService {
@@ -26,9 +26,9 @@ public class ProxyService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Proxy> findByActive()
-    {
-        return repository.findByActive(true);
+    public Optional<Proxy> findByActive() {
+	Optional<Proxy> proxy =  repository.findAllByActive(true).stream().findAny();
+	return proxy;
     }
 
     @Transactional

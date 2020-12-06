@@ -1,17 +1,19 @@
 server:
   port: ${PORT:8079}
   servlet:
-    context-path:
+    context-path: /
 spring:
   liquibase:
-    enabled: false
+    enabled: true 
     change-log: classpath:changelog/db.changelog-master.xml
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/realestatenotifier}
-    username: ${SPRING_DATASOURCE_USERNAME:mihailzubarev}
-    password: ${SPRING_DATASOURCE_PASSWORD:_Akvilani33}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/notification}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+    hikari:
+      maximum-pool-size: 3
 
   jpa:
     generate-ddl: false
