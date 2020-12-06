@@ -23,14 +23,17 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class RequestService {
 
 	@Value("${PARSER_SERVICE_URL:http://localhost:8060}")
-	private final String PARSER_SERVICE_URL = "";
-	@Value("${:http://localhost:8081}")
-	private final String NOTIFICATION_SERVICE_URL = "";
+	private final String PARSER_SERVICE_URL;
+	@Value("${NOTIFICATION_SERVICE_URL:http://localhost:8081}")
+	private final String NOTIFICATION_SERVICE_URL;
 	private final SearchService searchService;
+
+	public RequestService(SearchService searchService) {
+		this.searchService = searchService;
+	}
 	//todo аналог БД для пользовательских запросов, вынести в БД
 	private final Map<String, RequestParam> userRequestList = Collections.synchronizedMap(new HashMap<>());
 	//храним таски

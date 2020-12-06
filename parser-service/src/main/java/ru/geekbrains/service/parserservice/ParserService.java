@@ -12,6 +12,7 @@ import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.TaskService;
 
 import java.util.*;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -24,21 +25,25 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class ParserService {
 
+    @Value("${REST_SERVICE_URL:http://localhost:8079}")
+    private final String REST_SERVICE_URL;
     private TaskService taskService;
     private AdService adService;
     private List<Parser> parsers = new LinkedList<>();
-    private final Timer timer;
+    private Timer timer;
     private Task task;
     private Map<String, Object> ads = new HashMap<>();
     private boolean processing = false;
     private long delay = 2000;
-    @Value("${REST_SERVICE_URL:http://localhost:8079}")
-    private final String REST_SERVICE_URL = "";
 
     @Autowired
     public ParserService(TaskService taskService, AdService adService) {
         this.taskService = taskService;
         this.adService = adService;
+    }
+
+    @PostConstruct
+    private void startTask() {
         timer = new Timer("Checking tasks");
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -48,6 +53,7 @@ public class ParserService {
         };
         log.info("Start timer");
         timer.schedule(timerTask, new Date(), delay);
+
     }
 
     private void checkingTasks() {
