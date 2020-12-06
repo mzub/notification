@@ -62,19 +62,6 @@ public class AvitoClient {
     public AvitoClient(ProxyService proxyService, UserAgentService userAgentService) {
         this.userAgentService = userAgentService;
         this.proxyService = proxyService;
-        Optional<Proxy> optionalProxy = proxyService.findByActive();
-        if(!optionalProxy.isPresent()){
-            throw new RuntimeException("No valid proxy");
-        }
-        this.proxy = optionalProxy.get();
-
-
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                new AuthScope(this.proxy.getHost(), Integer.parseInt(this.proxy.getPort())),
-                new UsernamePasswordCredentials(this.proxy.getLogin(), this.proxy.getPassword()));
-        this.httpClient = HttpClients.custom()
-                .setDefaultCredentialsProvider(credsProvider).build();
     }
 
     public String findCity(String city) {
@@ -158,6 +145,20 @@ public class AvitoClient {
     }
 
     private String request(HttpUriRequest request) {
+	    
+        Optional<Proxy> optionalProxy = proxyService.findByActive();
+        if(!optionalProxy.isPresent()){
+            throw new RuntimeException("No valid proxy");
+        }
+        this.proxy = optionalProxy.get();
+
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(this.proxy.getHost(), Integer.parseInt(this.proxy.getPort())),
+                new UsernamePasswordCredentials(this.proxy.getLogin(), this.proxy.getPassword()));
+        this.httpClient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider).build();
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
 

@@ -19,7 +19,7 @@ spring:
     properties:
       hibernate:
 #        format_sql:true
-        ddl-auto: update 
+        ddl-auto: none
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
         temp:
           use_jdbc_metadata_defaults: false

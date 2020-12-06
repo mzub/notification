@@ -13,8 +13,3 @@ CREATE TABLE system.proxies
     CONSTRAINT proxies_pkey PRIMARY KEY (id)
 );
 
-GO
-
-INSERT INTO system.proxies
-(address, login, "password", active)
-VALUES('193.31.102.172:9061', 'Yhu7sP', 'TEvDBN', true);

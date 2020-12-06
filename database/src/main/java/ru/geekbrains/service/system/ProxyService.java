@@ -26,9 +26,9 @@ public class ProxyService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Proxy> findByActive() {
-	Optional<Proxy> proxy =  repository.findAllByActive(true).stream().findAny();
-	return proxy;
+    public Optional<ru.geekbrains.entity.system.Proxy> findByActive() {
+		return repository.findAllByActive(true).stream().findAny();
+	
     }
 
     @Transactional
