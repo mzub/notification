@@ -95,7 +95,6 @@ public class TelegramBot extends TelegramLongPollingBot implements Notification 
             //создаем пользователя и задаем ему состояние
 
             user = new BotData(new Answer(), chatId, state.ordinal());
-            user.getAnswer().setFloor("");
             botStateService.saveState(user);
 
             context = TelegramBotContext.of(this, user, message, taskService, userRepository);

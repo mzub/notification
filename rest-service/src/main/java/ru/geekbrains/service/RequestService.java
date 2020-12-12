@@ -29,13 +29,13 @@ public class RequestService {
 	private String PARSER_SERVICE_URL;
 	@Value("${NOTIFICATION_SERVICE_URL:http://localhost:8081}")
 	private String NOTIFICATION_SERVICE_URL;
-	
+
 	private final SearchService searchService;
 
 	public RequestService(SearchService searchService) {
 		this.searchService = searchService;
 	}
-	
+
 	//todo аналог БД для пользовательских запросов, вынести в БД
 	private final Map<String, RequestParam> userRequestList = Collections.synchronizedMap(new HashMap<>());
 	//храним таски
@@ -96,7 +96,7 @@ public class RequestService {
 
 	private String getKeyFromUserRequest(RequestParam requestParam) {
 		return "" + requestParam.getAnswer().getCountry().toLowerCase() + "."
-			+ requestParam.getAnswer().getCity().toLowerCase() + ".";
+				+ requestParam.getAnswer().getCity().toLowerCase() + ".";
 	}
 
 	private String generateTaskId() {

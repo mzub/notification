@@ -27,8 +27,8 @@ public class TaskService {
 		String url = builder.build().encode().toUriString();
 		log.info(String.format("url = %s", url));
 		log.info(String.format("Создаем задачу для парсеров по запросу пользователя = %s, фильтры = %s",
-			botData.getUser().getLogin(),
-			botData.getAnswer().toString()));
+				botData.getUser().getLogin(),
+				botData.getAnswer().toString()));
 		ResponseEntity responseEntity = restTemplate.postForEntity(url, botData, ResponseMessage.class);
 		ResponseMessage responseMessage = (ResponseMessage) responseEntity.getBody();
 		log.info(responseMessage.toString());
